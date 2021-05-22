@@ -1,7 +1,7 @@
 kB=1.38e-23 *1e-3; % J mK^-1 ; kg m^2 s^-2 mK^-1
 u0=1.66e-27; % kg
 %% Generate 1D Maxwell dist.
-n1=51;n2=21;T=0.050; % 50 uK
+n1=51;n2=21;T=0.50; % 50 uK
 plot_on=0;disp_on=0;
 [E,f_E,dE]= generate_prob_dens_energy(T,n1,n2,plot_on); %T and E in mK 
 %%
@@ -12,9 +12,11 @@ U_0_T=1.1;  % mK
 U_0 = -U_0_T/m*kB/w^2 *1e-12 *1e12; %um^2 us^-2
 
 fn_hm=diff(y, 2) == U_0*(y)*(1+epsil*cos(omega*t));
-fn_gauss=diff(y, 2) == U_0*(y)*exp(-2*(y/w)^2);
+fn_gauss=diff(y, 2) == U_0*(y)*exp(-2*(y/w)^2)*(1+epsil*cos(omega*t));
 % [V] = odeToVectorField(fn_gauss); % Gaussian
+% fn_name='gauss';
 [V] = odeToVectorField(fn_hm); % Harmonic
+fn_name='hm';
 M = matlabFunction(V,'vars', {'t','Y','omega','epsil'}); % t in us, y in um
 
 %%
@@ -70,5 +72,5 @@ for k=1:numel(resonances)
 end
 hold off
 fig_fold= './figures/';
-fig_filename = ['hm_U_0_' num2str(U_0_T) '_atom_T_' num2str(T) 'mean_dis_vs_mod_freq.fig'];
+fig_filename = [fn_name '_U_0_' num2str(U_0_T) 'mK_atom_T_' num2str(T) 'mK_epsilon_' num2str(epsil(1)) '_mean_dis_vs_mod_freq.fig'];
 savefig(gcf,[fig_fold fig_filename]);
